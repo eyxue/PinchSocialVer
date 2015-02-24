@@ -43,6 +43,24 @@ public class SearchNode {
         return this.cost;
     }
 
-      
+    public boolean equals(SearchNode other) {
+        return (this.path().equals(other.path()));
+    } 
+    
+    public boolean isIn(List<SearchNode> listOfNodes) {
+        boolean inList = false;
+        for (SearchNode node : listOfNodes) {
+            if (this.equals(node)) {
+                inList = true;
+            }
+        }
+        return inList;
+    } 
+    
+    public String toString() {
+        if (this.parent!=null)
+            return "("+this.state.toString() + "," + this.parent.toString() + ")";
+        return "("+this.state.toString() + ")";
+    } 
     
 }

@@ -41,5 +41,10 @@ public class Queue {
         }
         this.data = sortedNodes;
     }
+    
+    public String toString() {
+        return this.data.toString();
+    }
+        
 
 }

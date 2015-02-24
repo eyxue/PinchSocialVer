@@ -114,7 +114,17 @@ public class User {
      */
     public List<SearchNode> getSocialVerificationNode(User targetRunner) {
         List<SearchNode> listOfPaths = new ArrayList<SearchNode>();
-        while (listOfPaths.size() < 10) {
+        boolean foundAllPaths = false;
+        int i = -1;
+        while (listOfPaths.size() < 2 && !foundAllPaths) {
+            if (listOfPaths.size() > i) {
+                i = listOfPaths.size();
+            }
+            else {
+                break;
+            }
+            System.out.println(listOfPaths.size());
+//        for (int i = 0; i < 3; i++) {
             List<User> friendPath = new ArrayList<User>();
             if (this == targetRunner) {
                 friendPath.add(this);
@@ -128,26 +138,34 @@ public class User {
             Set<User> expanded = new HashSet<User>();
             while (!agenda.isEmpty()) {
                 agenda.sort();
+                //System.out.println(agenda);
                 SearchNode parent = agenda.pop();
                 if (!expanded.contains(parent.getState())) {
                     expanded.add(parent.getState());
-                    if (parent.getState() == targetRunner) {
+                    if (parent.getState().equals(targetRunner) && !parent.isIn(listOfPaths)) {
                         listOfPaths.add(parent);
+                        System.out.println("!!!!");
                     }
                     for (User childState : parent.getState().userSuccessors()) {
                         double childCost = parent.getCost() + parent.getState().getFriendCost(childState);
+                        System.out.println("childState " + childState);
                         SearchNode child = new SearchNode(childState, parent, childCost);
+                     
+                        System.out.println(child);
+                        System.out.println("Expanded" + expanded);
                         if (!expanded.contains(childState)) {
+                            System.out.println("woohoo");
                             agenda.push(child);
                         }
-                    }
-                }
+                    }     
+                }   
             }
+            //foundAllPaths = true;
         }
-        if (listOfPaths.size() > 0) {
-            return listOfPaths;
-        }
-        throw new NullPointerException("No connection to this person.");
+//        if (listOfPaths.size() > 0) {
+              return listOfPaths;
+//        } 
+//        throw new NullPointerException("No connection to this person.");
     }
     
     /**
@@ -155,7 +173,7 @@ public class User {
      * @param targetRunner
      * @return list of visited Users to get to targetRunner
      */
-    public List<List<User>> getSocialVerificationPath(User targetRunner) {
+    public List<List<User>> getSocialVerificationPaths(User targetRunner) {
         try {
             List<List<User>> listOfPaths = new ArrayList<List<User>>();
             for (SearchNode node : getSocialVerificationNode(targetRunner)) {
@@ -173,10 +191,13 @@ public class User {
      * @param targetRunner
      * @return pathfinding cost
      */
-    public double getSocialVerificationCost(User targetRunner) {
+    public List<Double> getSocialVerificationCost(User targetRunner) {
         try {
-            SearchNode parent = getSocialVerificationNode(targetRunner);
-            return parent.getCost();
+            List<Double> costList = new ArrayList<Double>();
+            for (SearchNode node : getSocialVerificationNode(targetRunner)) {
+                costList.add(node.getCost());
+            }
+            return costList;
         }
         catch (NullPointerException e){
             throw new NullPointerException("No connection to this person.");
@@ -189,8 +210,11 @@ public class User {
      * @return social verification score
      */
     public int getSocialVerificationScore(User targetRunner) {
-        double searchCost = getSocialVerificationCost(targetRunner);
-        return (int) ((int) 200/searchCost);
+        double searchCost = 0;
+        for (double cost : getSocialVerificationCost(targetRunner)) {
+            searchCost += (200/cost);
+        }
+        return (int) searchCost;
     }
     
     /**
@@ -205,6 +229,14 @@ public class User {
         catch (Exception e) {
             return false;
         }
+    }
+    
+    public String toString() {
+        return this.name.toString();
+    }
+    
+    public boolean equals(User other) {
+        return (this.name.equals(other.getName()));
     }
       
 }

@@ -8,6 +8,7 @@ import java.util.Map;
 public class Runner {
     
     public static void main(String args[]) {
+        
         User pooh = new User("Winnie the Pooh");
         User piglet = new User("Piglet");
         User chris = new User("Christopher Robin");
@@ -20,13 +21,13 @@ public class Runner {
         Map<User, Relation> roosFriends = new HashMap<User, Relation>();
         Map<User, Relation> chrissFriends = new HashMap<User, Relation>();
         
-        poohsFriends.put(piglet, Relation.FRIEND);
-        poohsFriends.put(chris, Relation.BESTFRIEND);
+        poohsFriends.put(piglet, Relation.BESTFRIEND);
+        poohsFriends.put(chris, Relation.FRIEND);
         poohsFriends.put(tigger, Relation.BESTFRIEND);
         poohsFriends.put(kanga, Relation.FRIEND);
         kangasFriends.put(roo, Relation.CHILD);
-        roosFriends.put(pooh, Relation.FRIEND);
-        roosFriends.put(chris, Relation.BESTFRIEND);
+        roosFriends.put(pooh, Relation.BESTFRIEND);
+        roosFriends.put(chris, Relation.FRIEND);
         chrissFriends.put(pooh, Relation.BESTFRIEND);
         chrissFriends.put(piglet, Relation.BESTFRIEND);
         
@@ -36,11 +37,16 @@ public class Runner {
         chris.setFriends(chrissFriends);
         
         List<List<User>> paths = roo.getSocialVerificationPaths(piglet);
-        List<String> namepath = new ArrayList<String>();
+        List<ArrayList<String>> namepath = new ArrayList<ArrayList<String>>();
         
-//        for (User user : path) {
-//            namepath.add(user.getName());
-//        }
+        for (List<User> node : paths) {
+            ArrayList<String> nameForOnePath = new ArrayList<String>();
+            for (User user : node) {
+                nameForOnePath.add(user.getName());
+            }
+            namepath.add(nameForOnePath);
+        }
+        
         
 //        SearchNode node1 = new SearchNode(pooh, null, 0);
 //        SearchNode node2 = new SearchNode(tigger, node1, 0);
@@ -49,7 +55,13 @@ public class Runner {
         
 
 //        System.out.println(roo.getSocialVerificationCost(piglet));
-        System.out.println(paths);
+        List<String> list1 = new ArrayList<String>();
+        list1.add("cool");
+        List<String> list2 = new ArrayList<String>();
+        list2.add("cool");
+        
+        System.out.println(namepath);
+
         
     }
 }
