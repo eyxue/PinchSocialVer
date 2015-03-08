@@ -35,6 +35,10 @@ public class User {
         return this.userID;
     }
     
+    public void setName(String name) {
+        this.name = name;
+    }
+    
     public String getName() {
         return this.name;
     }
@@ -76,22 +80,22 @@ public class User {
         double costAmount = 0;
         switch (relationToFriend) {
         case BESTFRIEND:
-            costAmount = 0.1;
+            costAmount = .1;
             break;
         case CHILD:
-            costAmount = 0.3;
+            costAmount = .3;
             break;
         case SIBLING:
-            costAmount = 0.3;
+            costAmount = .3;
             break;
         case PARENT:
-            costAmount = 0.5;
+            costAmount = .5;
             break;
         case GRANDPARENT:
-            costAmount = 0.5;
+            costAmount = .5;
             break;
         default:
-            costAmount = 1.0;
+            costAmount = 1;
             break;
         }
         return costAmount;
@@ -116,15 +120,7 @@ public class User {
         List<SearchNode> listOfPaths = new ArrayList<SearchNode>();
         boolean foundAllPaths = false;
         int i = -1;
-        while (listOfPaths.size() < 2 && !foundAllPaths) {
-            if (listOfPaths.size() > i) {
-                i = listOfPaths.size();
-            }
-            else {
-                break;
-            }
-            System.out.println(listOfPaths.size());
-//        for (int i = 0; i < 3; i++) {
+        while (!foundAllPaths) { //listOfPaths.size() < 5 && 
             List<User> friendPath = new ArrayList<User>();
             if (this == targetRunner) {
                 friendPath.add(this);
@@ -137,35 +133,37 @@ public class User {
             agenda.push(startNode);
             Set<User> expanded = new HashSet<User>();
             while (!agenda.isEmpty()) {
-                agenda.sort();
-                //System.out.println(agenda);
+                //agenda.sort();
                 SearchNode parent = agenda.pop();
+                if (parent.path().size() > 5) {
+                    break;
+                }
                 if (!expanded.contains(parent.getState())) {
                     expanded.add(parent.getState());
+//                    System.out.println(parent.getState().equals(targetRunner));
+//                    System.out.println(!parent.isIn(listOfPaths));
                     if (parent.getState().equals(targetRunner) && !parent.isIn(listOfPaths)) {
                         listOfPaths.add(parent);
-                        System.out.println("!!!!");
+                        expanded.remove(parent.getState());
+//                        System.out.println("!!!!");
                     }
+//                    System.out.println("List of Paths: " + listOfPaths);
                     for (User childState : parent.getState().userSuccessors()) {
                         double childCost = parent.getCost() + parent.getState().getFriendCost(childState);
-                        System.out.println("childState " + childState);
+//                        System.out.println("childState " + childState);
                         SearchNode child = new SearchNode(childState, parent, childCost);
-                     
-                        System.out.println(child);
-                        System.out.println("Expanded" + expanded);
+//                        System.out.println(child);
+//                        System.out.println("Expanded " + expanded);
                         if (!expanded.contains(childState)) {
-                            System.out.println("woohoo");
                             agenda.push(child);
+//                            System.out.println("woohoo");
                         }
                     }     
                 }   
             }
-            //foundAllPaths = true;
+            foundAllPaths = true;
         }
-//        if (listOfPaths.size() > 0) {
-              return listOfPaths;
-//        } 
-//        throw new NullPointerException("No connection to this person.");
+        return listOfPaths;
     }
     
     /**
@@ -174,16 +172,16 @@ public class User {
      * @return list of visited Users to get to targetRunner
      */
     public List<List<User>> getSocialVerificationPaths(User targetRunner) {
-        try {
+//        try {
             List<List<User>> listOfPaths = new ArrayList<List<User>>();
             for (SearchNode node : getSocialVerificationNode(targetRunner)) {
                 listOfPaths.add(node.path());
             }
             return listOfPaths;
-        }
-        catch (NullPointerException e){
-            throw new NullPointerException("No connection to this person.");
-        }
+//        }
+//        catch (NullPointerException e){
+//            throw new NullPointerException("No connection to this person.");
+//        }
     }
     
     /**
@@ -194,9 +192,12 @@ public class User {
     public List<Double> getSocialVerificationCost(User targetRunner) {
         try {
             List<Double> costList = new ArrayList<Double>();
+            double cost = 0;
             for (SearchNode node : getSocialVerificationNode(targetRunner)) {
                 costList.add(node.getCost());
+                cost += node.getCost();
             }
+            //System.out.println(cost);
             return costList;
         }
         catch (NullPointerException e){
@@ -212,7 +213,9 @@ public class User {
     public int getSocialVerificationScore(User targetRunner) {
         double searchCost = 0;
         for (double cost : getSocialVerificationCost(targetRunner)) {
-            searchCost += (200/cost);
+            if (cost > Math.pow(10, -6)) {
+                searchCost += (200/cost);
+            }
         }
         return (int) searchCost;
     }
@@ -223,12 +226,12 @@ public class User {
      * @return boolean
      */
     public boolean socialVerification(User targetRunner) {
-        try {
+        //try {
             return getSocialVerificationScore(targetRunner) >= this.getSocialCutoff();
-        }
-        catch (Exception e) {
-            return false;
-        }
+//        }
+//        catch (Exception e) {
+//            return false;
+//        }
     }
     
     public String toString() {

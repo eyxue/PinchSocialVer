@@ -28,9 +28,6 @@ public class SearchNode {
             p.add(node.state);
             node = node.parent;
         }
-        if (p.size() > 5) {
-            return null;
-        }
         Collections.reverse(p);
         return p;
     }
