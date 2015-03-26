@@ -54,6 +54,7 @@ public class SearchNode {
         return inList;
     } 
     
+    @Override
     public String toString() {
         if (this.parent!=null)
             return "("+this.state.toString() + "," + this.parent.toString() + ")";

@@ -74,6 +74,7 @@ public class UserTests {
         poohsFriends.put(chris, Relation.BESTFRIEND);
         poohsFriends.put(tigger, Relation.BESTFRIEND);
         poohsFriends.put(kanga, Relation.FRIEND);
+        poohsFriends.put(roo, Relation.FRIEND);
         kangasFriends.put(roo, Relation.CHILD);
         kangasFriends.put(piglet, Relation.FRIEND);
         roosFriends.put(pooh, Relation.BESTFRIEND);
@@ -92,7 +93,7 @@ public class UserTests {
         panFriends.put(goten, Relation.FRIEND);
         
   
-        pooh.setFriends(poohsFriends); //{piglet=BESTFRIEND, chris=BESTFRIEND, tigger=BESTFRIEND, kanga=FRIEND}
+        pooh.setFriends(poohsFriends); //{piglet=BESTFRIEND, chris=BESTFRIEND, tigger=BESTFRIEND, kanga=FRIEND , roo=FRIEND}
         kanga.setFriends(kangasFriends); //{roo=CHILD, piglet=FRIEND}
         roo.setFriends(roosFriends); //{pooh=BESTFRIEND, chris=FRIEND}
         chris.setFriends(chrissFriends); //{piglet=BESTFRIEND, pooh=BESTFRIEND, kanga=PARENT}  
@@ -129,20 +130,28 @@ public class UserTests {
     }
     
     @Test
+    public void testGetSocialVerificationPathsMultipleSizes() {
+        
+        List<List<User>> poohpaths = pooh.getSocialVerificationPaths(piglet);
+        System.out.println(poohpaths);
+        assertEquals(3,poohpaths.size());
+
+        
+    }
+    
+    @Test
     public void testGetSocialVerificationScoreMoreThanOnePath() {
 
         int rooscore = roo.getSocialVerificationScore(piglet);
         System.out.println(rooscore);
-        assertTrue(rooscore>100);
+        assertTrue(roo.socialVerification(piglet));
+        roo.setSocialCutoff(2000);
+        assertFalse(roo.socialVerification(piglet));
+        roo.setSocialCutoff(100);
+        
     }
     
-    @Test
-    public void testGetSocialVerificationTrue() {
-
-        boolean roover = roo.socialVerification(piglet);
-        System.out.println(roover);
-        assertTrue(roover);
-    }
+    
     
     @Test
     public void testGetSocialVerificationTwoDegrees() {

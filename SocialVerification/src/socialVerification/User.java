@@ -8,12 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 
+
 public class User {
     
-    private String userID;
+    private final String userID;
     private String name;
     private Map<User, Relation> friendsList;
     private int socialCutoff;
+    private final int HOPS = 5; // max degrees of separation from user to other user
     
     /**
      * initializes new User. Only parameter needed is the user's id.
@@ -26,28 +28,35 @@ public class User {
      */
     public User(String userID){
         this.userID = userID;
-        this.name = userID;
+        this.name = userID; // change to untitled
         this.friendsList = new HashMap<User, Relation>();
         this.socialCutoff = 100;
     }
     
-    public String getUserID() {
+    public User(String userID, String name){
+        this.userID = userID;
+        this.name = name;
+        this.friendsList = new HashMap<User, Relation>();
+        this.socialCutoff = 100;
+    }
+    
+    private String getUserID() {
         return this.userID;
     }
     
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
     
-    public String getName() {
+    private String getName() {
         return this.name;
     }
     
-    public Map<User, Relation> getFriendsList() {
+    private Map<User, Relation> getFriendsList() {
         return this.friendsList;
     }
     
-    public int getSocialCutoff() {
+    private int getSocialCutoff() {
         return this.socialCutoff;
     }
     
@@ -67,6 +76,14 @@ public class User {
      */
     public void setFriends(Map<User, Relation> listOfFriends) {
         this.friendsList = listOfFriends;
+    }
+    
+    /**
+     * add friend and relation to friendsList
+     * @param friend, relation
+     */
+    public void addFriend(User user, Relation relation) {
+        this.friendsList.put(user, relation);
     }
     
     
@@ -119,7 +136,6 @@ public class User {
     public List<SearchNode> getSocialVerificationNode(User targetRunner) {
         List<SearchNode> listOfPaths = new ArrayList<SearchNode>();
         boolean foundAllPaths = false;
-        int i = -1;
         while (!foundAllPaths) { //listOfPaths.size() < 5 && 
             List<User> friendPath = new ArrayList<User>();
             if (this == targetRunner) {
@@ -135,28 +151,20 @@ public class User {
             while (!agenda.isEmpty()) {
                 //agenda.sort();
                 SearchNode parent = agenda.pop();
-                if (parent.path().size() > 5) {
+                if (parent.path().size() > HOPS) {
                     break;
                 }
                 if (!expanded.contains(parent.getState())) {
                     expanded.add(parent.getState());
-//                    System.out.println(parent.getState().equals(targetRunner));
-//                    System.out.println(!parent.isIn(listOfPaths));
                     if (parent.getState().equals(targetRunner) && !parent.isIn(listOfPaths)) {
                         listOfPaths.add(parent);
                         expanded.remove(parent.getState());
-//                        System.out.println("!!!!");
                     }
-//                    System.out.println("List of Paths: " + listOfPaths);
                     for (User childState : parent.getState().userSuccessors()) {
                         double childCost = parent.getCost() + parent.getState().getFriendCost(childState);
-//                        System.out.println("childState " + childState);
                         SearchNode child = new SearchNode(childState, parent, childCost);
-//                        System.out.println(child);
-//                        System.out.println("Expanded " + expanded);
                         if (!expanded.contains(childState)) {
                             agenda.push(child);
-//                            System.out.println("woohoo");
                         }
                     }     
                 }   
@@ -234,12 +242,15 @@ public class User {
 //        }
     }
     
+    @Override
     public String toString() {
         return this.name.toString();
     }
     
-    public boolean equals(User other) {
-        return (this.name.equals(other.getName()));
+    @Override
+    public boolean equals(Object thatObject) {
+        User other = (User) thatObject;
+        return (this.userID.equals(other.userID));
     }
       
 }
