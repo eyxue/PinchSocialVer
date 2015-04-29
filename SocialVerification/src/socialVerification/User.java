@@ -244,7 +244,7 @@ public class User {
     
     @Override
     public String toString() {
-        return this.name.toString();
+        return "(Name: " + this.name.toString() + ", Friends: " + this.friendsList.size() + ")";
     }
     
     @Override
